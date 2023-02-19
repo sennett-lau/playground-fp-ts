@@ -8,6 +8,8 @@ const getWines = (type: string): () => TE.TaskEither<Error, AxiosResponse> => {
     return TE.tryCatchK(() => axios.get(`https://api.sampleapis.com/wines/${type}`), (reason) => new Error(String(reason)))
 }
 
+const getWinesPipe = <AxiosResponse>(type: string) => pipeTEDo(getWines(type))
+
 const main = async () => {
     const wineTypes = ['reds', 'whites', 'sparkling']
 
@@ -15,7 +17,7 @@ const main = async () => {
 
     const data = await pipe(
         wineTypes,
-        TE.traverseArray((type: string) => pipeTEDo(getWines(type))),
+        TE.traverseArray(getWinesPipe),
         TE.map((res) => res.map((r) => r.data.length)),
         TE.map((res) => res.reduce((acc, curr) => acc + curr, 0)),
     )()
