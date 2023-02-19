@@ -1,13 +1,13 @@
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import * as TE from 'fp-ts/lib/TaskEither'
 import { pipe } from "fp-ts/function"
 
-const getWines = (type: string) => {
+const getWines = (type: string): () => TE.TaskEither<Error, AxiosResponse> => {
     console.log(type)
     return TE.tryCatchK(() => axios.get(`https://api.sampleapis.com/wines/${type}`), (reason) => new Error(String(reason)))
 }
 
-const getWinesPipe = (type: string) => pipe(
+const getWinesPipe = (type: string): TE.TaskEither<Error, AxiosResponse> => pipe(
     TE.Do,
     getWines(type),
 )
